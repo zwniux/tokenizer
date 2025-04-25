@@ -3,6 +3,7 @@ module github.com/sugarme/tokenizer
 go 1.18
 
 require (
+	github.com/dlclark/regexp2 v1.11.4
 	github.com/emirpasic/gods v1.12.0
 	github.com/rivo/uniseg v0.1.0
 	github.com/schollz/progressbar/v2 v2.15.0
