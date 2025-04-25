@@ -117,13 +117,28 @@ func (s *StringPattern) FindMatches(inside string) []OffsetsMatch {
 
 func findAllStringIndex(re *regexp2.Regexp, s string, n int) [][]int {
 	var matches [][]int
-	for m, err := re.FindStringMatch(s); m != nil && err == nil; m, err = re.FindNextMatch(m) {
-		matches = append(matches, []int{m.Index, m.Index + m.Length})
+	r := []rune(s)
+	lastRpos := 0
+	lastSpos := 0
+	for m, err := re.FindRunesMatch(r); m != nil && err == nil; m, err = re.FindNextMatch(m) {
+		lastRpos, lastSpos = runeStringPos(r, lastRpos, m.Index, lastSpos)
+		mStart := lastSpos
+		lastRpos, lastSpos = runeStringPos(r, lastRpos, m.Index+m.Length, lastSpos)
+		mEnd := lastSpos
+		matches = append(matches, []int{mStart, mEnd})
 		if n > 0 && len(matches) >= n {
 			break
 		}
 	}
 	return matches
+}
+
+func runeStringPos(r []rune, lastRpos int, index int, lastSpos int) (int, int) {
+	for _, v := range r[lastRpos:index] {
+		lastSpos += len(string(v))
+		lastRpos++
+	}
+	return lastRpos, lastSpos
 }
 
 func findMatches(re *regexp2.Regexp, inside string) []OffsetsMatch {
